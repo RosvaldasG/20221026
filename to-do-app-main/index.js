@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const userRoutes = require("./api/routes/tasks");
+const tasksRoutes = require("./api/routes/tasks");
+const usersRoutes = require("./api/routes/user");
 const mongoose = require("mongoose");
 const app = express();
 require("dotenv").config();
@@ -19,7 +20,8 @@ mongoose
     console.log(err);
   });
 
-app.use(userRoutes);
+app.use(tasksRoutes);
+app.use(usersRoutes);
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
