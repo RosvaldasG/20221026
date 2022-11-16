@@ -64,13 +64,13 @@ module.exports.CHANGE_TASK_STATUS = async (req, res) => {
   });
 };
 
-module.exports.DELETE_TASK = (req, res) => {
-  TaskSchema.deleteMany({ isDone: req.params.id }).then((results) => {
-    console.log("results", results);
-    res.status(200).json({
-      statusMessage: "Item was deleted sucessfuly",
+module.exports.DELETE_TASK = async function (req, res) {
+  const resultFromDb = await TaskSchema.deleteOne({
+    _id: req.params.id,
+  }).exec();
 
-      deletedItem: results,
-    });
+  return res.status(200).json({
+    statusMessage: "Item was deleted sucessfuly",
+    deletedItem: resultFromDb,
   });
 };
