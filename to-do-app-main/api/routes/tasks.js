@@ -1,5 +1,8 @@
 const express = require("express");
 const router = express.Router();
+
+const auth = require("../middlewares/auth");
+
 const {
   GET_TASKS,
   GET_TASK,
@@ -9,7 +12,7 @@ const {
   DELETE_TASK,
 } = require("../controllers/tasks");
 
-router.get("/getTasks", GET_TASKS);
+router.get("/getTasks", auth, GET_TASKS);
 
 router.get("/getTask/:id", GET_TASK);
 

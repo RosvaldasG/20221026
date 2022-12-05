@@ -1,10 +1,12 @@
 const bcrypt = require("bcryptjs");
-const { rawListeners } = require("../models/userModel");
+const { rawListeners } = require("../models/userModel"); //neaišku kam
+const jwt = require("jsonwebtoken");
+
 const UserSchema = require("../models/userModel");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 module.exports.CREATE_USER = async (req, res) => {
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  const hashedPassword = await bcrypt.hash(req.body.password, 10); // užkoduojama slaptažodį
 
   const user = new UserSchema({
     name: req.body.name,
@@ -53,16 +55,36 @@ module.exports.GET_USER = async function (req, res) {
 };
 
 module.exports.USER_LOGIN = async (req, res) => {
-  const user = await UserSchema.findOne({ email: req.body.email });
+  try {
+    const user = await UserSchema.findOne({ email: req.body.email });
 
-  const isPasswordMatch = await bcrypt.compare(
-    req.body.password,
-    user.password
-  );
+    const isPasswordMatch = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
 
-  if (isPasswordMatch) {
-    return res.status(200).json({ status: "LOGIN successfull" });
+    console.log(user);
+
+    if (isPasswordMatch) {
+      const token = jwt.sign(
+        {
+          email: user.email,
+          userId: user._id,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" },
+        { algorythm: "RS256" }
+      );
+
+      return res
+        .status(200)
+        .json({ status: "login successfull", jwt_token: token });
+    }
+    return res.status(401).json({ status: "login failed" });
+  } catch (err) {
+    console.log("req.body", req.body);
+
+    console.log("err", err);
+    return res.status(401).json({ status: "login failed" });
   }
-
-  return res.status(401).json({ status: "LOGIN failed" });
 };
