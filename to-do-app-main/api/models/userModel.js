@@ -6,6 +6,7 @@ const userSchema = mongoose.Schema({
   taskIds: { type: Array },
   totalTasksDone: { type: Number },
   password: { type: String, required: true, min: 15 },
+  reg_timestamp: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("User", userSchema);
